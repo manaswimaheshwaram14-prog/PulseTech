@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseTech Sign Up</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #050b1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .signup-box {
+            width: 420px;
+            padding: 40px;
+            background: #10192e;
+            border: 1px solid #30405f;
+            border-radius: 18px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin: 15px 0 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #30405f;
+            background: #18233d;
+            color: white;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #3478f6;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        .login-link {
+            margin-top: 20px;
+        }
+
+        a {
+            color: #6ea8ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="signup-box">
+
+    <h1>PulseTech</h1>
+
+    <h2>Create Account</h2>
+
+    <form action="/signup" method="POST">
+
+        <label for="username">Username</label>
+        <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Create username"
+            required
+        >
+
+        <label for="password">Password</label>
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create password"
+            required
+        >
+
+        <button type="submit">Create Account</button>
+
+    </form>
+
+    <p class="login-link">
+        Already have an account?
+        <a href="/">Login</a>
+    </p>
+
+</div>
+
+</body>
+</html>

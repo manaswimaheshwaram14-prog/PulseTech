@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseTech Dashboard</title>
+
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #050b1a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            padding: 25px 50px;
+            background: #10192e;
+            border-bottom: 1px solid #30405f;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .header p {
+            color: #91a8d0;
+            margin: 8px 0 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 25px;
+        }
+
+        .patient-card {
+            background: #10192e;
+            border: 1px solid #30405f;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .patient-card h2 {
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .input-box {
+            background: #070d1d;
+            border: 1px solid #30405f;
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .input-box label {
+            display: block;
+            color: #91a8d0;
+            margin-bottom: 10px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 12px;
+            background: #10192e;
+            border: 1px solid #405070;
+            border-radius: 8px;
+            color: white;
+            font-size: 17px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #f5164d;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: #10192e;
+            border: 1px solid #30405f;
+            border-radius: 18px;
+            padding: 25px;
+        }
+
+        .card h3 {
+            color: #91a8d0;
+            margin-top: 0;
+        }
+
+        .value {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .risk {
+            text-align: center;
+            margin-top: 25px;
+            padding: 30px;
+            background: #10192e;
+            border: 1px solid #30405f;
+            border-radius: 18px;
+        }
+
+        .risk h2 {
+            margin-top: 0;
+        }
+
+        .risk-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff315d;
+        }
+        .logout-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #ff315b;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    opacity: 0.85;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="header">  
+    <h1>⚡ PulseTech</h1>
+    <a href="/logout" class="logout-btn">Logout</a>
+    <p>ICU Clinical Deterioration & Early Intervention Monitor</p>
+</div>
+
+<div class="container">
+
+    <div class="patient-card">
+        <h2>Patient Vital Signs</h2>
+
+        <div class="grid">
+
+            <div class="input-box">
+                <label>Heart Rate (bpm)</label>
+                <input type="number" id="heart_rate" value="101">
+            </div>
+
+            <div class="input-box">
+                <label>Systolic Blood Pressure</label>
+                <input type="number" id="systolic_bp" value="110">
+            </div>
+
+            <div class="input-box">
+                <label>SpO₂ (%)</label>
+                <input type="number" id="spo2" value="92">
+            </div>
+
+            <div class="input-box">
+                <label>Lactate (mmol/L)</label>
+                <input type="number" step="0.1" id="lactate" value="2.1">
+            </div>
+
+        </div>
+
+        <button type="button" onclick="predict()">Analyze Patient Risk</button>
+    </div>
+
+
+    <div class="info">
+
+        <div class="card">
+            <h3>❤️ Heart Rate</h3>
+            <div class="value" id="heartDisplay">101 bpm</div>
+        </div>
+
+        <div class="card">
+            <h3>🩸 Blood Pressure</h3>
+            <div class="value" id="bpDisplay">110 mmHg</div>
+        </div>
+
+        <div class="card">
+            <h3>💧 SpO₂</h3>
+            <div class="value" id="spo2Display">92 %</div>
+        </div>
+
+        <div class="card">
+            <h3>🧪 Lactate</h3>
+            <div class="value" id="lactateDisplay">2.1</div>
+        </div>
+
+    </div>
+
+
+    <div class="risk">
+        <h2>Sepsis Risk Assessment</h2>
+
+        <div class="risk-value" id="riskResult">
+            Awaiting Analysis
+        </div>
+
+        <p id="probability">
+            Enter patient vitals and analyze the risk.
+        </p>
+    </div>
+
+</div>
+
+
+<script>
+
+async function predict() {
+
+    const heart_rate = document.getElementById("heart_rate").value;
+    const systolic_bp = document.getElementById("systolic_bp").value;
+    const spo2 = document.getElementById("spo2").value;
+    const lactate = document.getElementById("lactate").value;
+
+    document.getElementById("heartDisplay").innerText =
+        heart_rate + " bpm";
+
+    document.getElementById("bpDisplay").innerText =
+        systolic_bp + " mmHg";
+
+    document.getElementById("spo2Display").innerText =
+        spo2 + " %";
+
+    document.getElementById("lactateDisplay").innerText =
+        lactate;
+
+    const response = await fetch("/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            heart_rate: Number(heart_rate),
+            systolic_bp: Number(systolic_bp),
+            spo2: Number(spo2),
+            lactate: Number(lactate)
+        })
+    });
+
+    const data = await response.json();
+
+    document.getElementById("riskResult").innerText =
+        data.prediction === 1 ? "⚠️ HIGH RISK" : "✅ LOW RISK";
+
+    document.getElementById("probability").innerText =
+        "Risk Probability: " + data.probability + "%";
+}
+
+</script>
+
+</body>
+</html>
