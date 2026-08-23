@@ -47,6 +47,8 @@ def login_user():
         )
 
     return render_template("dashboard.html")
+
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "GET":
         return render_template("signup.html")
