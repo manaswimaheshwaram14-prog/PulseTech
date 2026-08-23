@@ -1,282 +1,2245 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PulseTech Dashboard</title>
 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>PulseTech | ICU Prediction Dashboard</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            background: #050b1a;
-            color: white;
-            font-family: Arial, sans-serif;
+            background: #070b17;
+            color: #f4f7ff;
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
         }
 
-        .header {
-            padding: 25px 50px;
-            background: #10192e;
-            border-bottom: 1px solid #30405f;
+        /* ================= HEADER ================= */
+
+        .topbar {
+            height: 82px;
+            background: #0c1224;
+            border-bottom: 1px solid #202a42;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 35px;
         }
 
-        .header h1 {
-            margin: 0;
-            font-size: 32px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
-        .header p {
-            color: #91a8d0;
-            margin: 8px 0 0;
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+
+            border-radius: 12px;
+
+            background: linear-gradient(
+                135deg,
+                #ff315d,
+                #ff174f
+            );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 24px;
+            font-weight: bold;
+
+            box-shadow:
+                0 0 25px rgba(255, 49, 93, 0.35);
         }
 
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 25px;
+        .brand-text h1 {
+            font-size: 24px;
         }
 
-        .patient-card {
-            background: #10192e;
-            border: 1px solid #30405f;
-            border-radius: 18px;
+        .brand-text p {
+            color: #74809b;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .status-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status {
+            border: 1px solid #263451;
+            background: #0a1020;
+
+            padding: 12px 18px;
+
+            border-radius: 10px;
+
+            color: #8c98b3;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            display: inline-block;
+
+            width: 8px;
+            height: 8px;
+
+            background: #20d9a0;
+
+            border-radius: 50%;
+
+            margin-right: 8px;
+
+            box-shadow:
+                0 0 10px #20d9a0;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            padding: 30px;
+        }
+
+        /* ================= SEARCH ================= */
+
+        .search-section {
+            background: #0c1224;
+
+            border: 1px solid #202a42;
+
+            border-radius: 16px;
+
             padding: 25px;
+
             margin-bottom: 25px;
         }
 
-        .patient-card h2 {
-            margin-top: 0;
+        .search-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 20px;
         }
 
-        .grid {
+        .search-title h2 {
+            font-size: 20px;
+        }
+
+        .search-title span {
+            color: #74809b;
+            font-size: 13px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-box input {
+            flex: 1;
+
+            height: 52px;
+
+            background: #070c1b;
+
+            border: 1px solid #2a3857;
+
+            border-radius: 10px;
+
+            color: white;
+
+            padding: 0 18px;
+
+            font-size: 16px;
+
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: #ff315d;
+
+            box-shadow:
+                0 0 0 3px rgba(255,49,93,0.10);
+        }
+
+        .search-box button {
+            width: 180px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #ff174f;
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .search-box button:hover {
+            background: #ff315d;
+
+            transform: translateY(-1px);
+        }
+
+        #errorMessage {
+            display: none;
+
+            color: #ff5d7d;
+
+            margin-top: 12px;
+
+            font-size: 14px;
+        }
+
+        /* ================= DASHBOARD ================= */
+
+        #patientDashboard {
+            display: none;
+        }
+
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+
+            grid-template-columns:
+                330px
+                1fr;
+
+            gap: 22px;
         }
 
-        .input-box {
-            background: #070d1d;
-            border: 1px solid #30405f;
+        /* ================= PATIENT PANEL ================= */
+
+        .patient-panel {
+            background: #0c1224;
+
+            border: 1px solid #202a42;
+
+            border-radius: 16px;
+
+            padding: 22px;
+
+            min-height: 550px;
+        }
+
+        .panel-heading {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+        .panel-heading h3 {
+            font-size: 15px;
+        }
+
+        .critical-count {
+            background: rgba(255,49,93,0.12);
+
+            border: 1px solid rgba(255,49,93,0.4);
+
+            color: #ff5477;
+
+            padding: 6px 10px;
+
+            border-radius: 8px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+        .patient-card {
+            background: #080e1d;
+
+            border: 1px solid #202b45;
+
             border-radius: 14px;
+
+            padding: 18px;
+
+            margin-bottom: 15px;
+        }
+
+        .patient-top {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            margin-bottom: 14px;
+        }
+
+        .bed-number {
+            font-size: 17px;
+
+            font-weight: bold;
+        }
+
+        .patient-name {
+            color: #98a5c0;
+
+            font-size: 13px;
+
+            margin-top: 5px;
+        }
+
+        .risk-badge {
+            padding: 7px 10px;
+
+            border-radius: 7px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+        .risk-high {
+            color: #ff5477;
+
+            border: 1px solid #8e2942;
+
+            background: rgba(255,49,93,0.1);
+        }
+
+        .risk-medium {
+            color: #f6b93b;
+
+            border: 1px solid #795c20;
+
+            background: rgba(246,185,59,0.08);
+        }
+
+        .risk-low {
+            color: #20d9a0;
+
+            border: 1px solid #176c56;
+
+            background: rgba(32,217,160,0.08);
+        }
+
+        .condition {
+            color: #71809e;
+
+            font-size: 13px;
+
+            margin-bottom: 15px;
+        }
+
+        .trend {
+            font-size: 12px;
+
+            color: #20d9a0;
+        }
+
+        .trend.warning {
+            color: #f6b93b;
+        }
+
+        .trend.critical {
+            color: #ff5477;
+        }
+
+        /* ================= RIGHT SIDE ================= */
+
+        .right-panel {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 22px;
+        }
+
+        /* ================= PATIENT HEADER ================= */
+
+        .patient-header {
+            background: #0c1224;
+
+            border: 1px solid #202a42;
+
+            border-radius: 16px;
+
+            padding: 25px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+        .patient-header h2 {
+            font-size: 25px;
+        }
+
+        .patient-header p {
+            color: #77839e;
+
+            margin-top: 7px;
+
+            font-size: 13px;
+        }
+
+        .large-risk {
+            text-align: right;
+        }
+
+        .large-risk-label {
+            color: #68758f;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 5px;
+        }
+
+        .large-risk-value {
+            font-size: 30px;
+
+            font-weight: bold;
+        }
+
+        /* ================= VITAL CARDS ================= */
+
+        .vitals-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+        }
+
+        .vital-card {
+            background: #0c1224;
+
+            border: 1px solid #202a42;
+
+            border-radius: 14px;
+
             padding: 20px;
         }
 
-        .input-box label {
-            display: block;
-            color: #91a8d0;
-            margin-bottom: 10px;
+        .vital-label {
+            color: #78859f;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 12px;
         }
 
-        .input-box input {
-            width: 100%;
-            padding: 12px;
-            background: #10192e;
-            border: 1px solid #405070;
-            border-radius: 8px;
-            color: white;
-            font-size: 17px;
-        }
+        .vital-value {
+            font-size: 28px;
 
-        button {
-            width: 100%;
-            margin-top: 25px;
-            padding: 16px;
-            border: none;
-            border-radius: 10px;
-            background: #f5164d;
-            color: white;
-            font-size: 18px;
             font-weight: bold;
-            cursor: pointer;
         }
 
-        .info {
+        .vital-unit {
+            color: #697690;
+
+            font-size: 11px;
+
+            margin-left: 4px;
+        }
+
+        .vital-line {
+            height: 3px;
+
+            margin-top: 14px;
+
+            border-radius: 3px;
+
+            background: #26334e;
+        }
+
+        .heart-line {
+            background: #ff315d;
+        }
+
+        .bp-line {
+            background: #22d3ee;
+        }
+
+        .spo-line {
+            background: #20d9a0;
+        }
+
+        .lactate-line {
+            background: #f59e0b;
+        }
+
+        /* ================= GRAPH GRID ================= */
+
+        .graph-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 18px;
         }
 
-        .card {
-            background: #10192e;
-            border: 1px solid #30405f;
-            border-radius: 18px;
-            padding: 25px;
+        .graph-card {
+            background: #0c1224;
+
+            border: 1px solid #202a42;
+
+            border-radius: 16px;
+
+            padding: 20px;
+
+            height: 330px;
         }
 
-        .card h3 {
-            color: #91a8d0;
-            margin-top: 0;
+        .graph-card h3 {
+            font-size: 14px;
+
+            margin-bottom: 12px;
+
+            color: #e6ebf8;
         }
 
-        .value {
-            font-size: 30px;
+        .chart-container {
+            height: 265px;
+        }
+
+        /* ================= INTERVENTION ================= */
+
+        .intervention {
+            background: #0c1224;
+
+            border: 1px solid #202a42;
+
+            border-radius: 16px;
+
+            padding: 24px;
+        }
+
+        .intervention h3 {
+            font-size: 14px;
+
+            margin-bottom: 8px;
+        }
+
+        .intervention p {
+            color: #75829d;
+
+            font-size: 13px;
+
+            margin-bottom: 17px;
+        }
+
+        .intervention-button {
+            width: 100%;
+
+            height: 50px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #ff174f;
+
+            color: white;
+
             font-weight: bold;
+
+            cursor: pointer;
+
+            font-size: 14px;
         }
 
-        .risk {
-            text-align: center;
-            margin-top: 25px;
-            padding: 30px;
-            background: #10192e;
-            border: 1px solid #30405f;
-            border-radius: 18px;
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 1100px) {
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-panel {
+                min-height: auto;
+            }
+
+            .vitals-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
         }
 
-        .risk h2 {
-            margin-top: 0;
-        }
+        @media(max-width: 700px) {
 
-        .risk-value {
-            font-size: 36px;
-            font-weight: bold;
-            color: #ff315d;
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .status-area {
+                display: none;
+            }
+
+            .main {
+                padding: 15px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box button {
+                width: 100%;
+                height: 50px;
+            }
+
+            .vitals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .graph-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-header {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+            .large-risk {
+                text-align: left;
+            }
+
         }
-        .logout-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background: #ff315b;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
+.beds-section {
+    margin: 30px 0;
 }
 
-.logout-btn:hover {
-    opacity: 0.85;
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 22px;
+}
+
+.section-heading p {
+    margin: 8px 0 0;
+    color: #71809b;
+}
+
+.bed-count {
+    background: #1b263d;
+    color: #ffffff;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.beds-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.bed-card {
+    display: block;
+    text-decoration: none;
+    background: #080e1d;
+    border: 1px solid #202b45;
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.bed-card:hover {
+    transform: translateY(-5px);
+    background: #0c1426;
+}
+
+.bed-card.high {
+    border-left: 4px solid #ff3158;
+}
+
+.bed-card.medium {
+    border-left: 4px solid #f5a623;
+}
+
+.bed-card.low {
+    border-left: 4px solid #18c98b;
+}
+
+.bed-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.bed-number {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.patient-name {
+    color: #dce4f5;
+    font-size: 15px;
+    margin-top: 7px;
+}
+
+.patient-info {
+    color: #71809b;
+    margin-top: 18px;
+    font-size: 13px;
+}
+
+.risk-badge {
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.high-badge {
+    color: #ff6682;
+    background: rgba(255, 49, 88, 0.12);
+    border: 1px solid #ff3158;
+}
+
+.medium-badge {
+    color: #ffbd45;
+    background: rgba(245, 166, 35, 0.12);
+    border: 1px solid #f5a623;
+}
+
+.low-badge {
+    color: #22d89a;
+    background: rgba(24, 201, 139, 0.12);
+    border: 1px solid #18c98b;
+}
+
+.status {
+    margin-top: 18px;
+    font-size: 12px;
+}
+
+.high-status {
+    color: #ff6682;
+}
+
+.medium-status {
+    color: #ffbd45;
+}
+
+.low-status {
+    color: #22d89a;
+}
+
+.view-patient {
+    margin-top: 22px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+@media (max-width: 900px) {
+    .beds-grid {
+        grid-template-columns: 1fr;
+    }
 }
     </style>
+
 </head>
+
 
 <body>
 
-<div class="header">  
-    <h1>⚡ PulseTech</h1>
-    <a href="/logout" class="logout-btn">Logout</a>
-    <p>ICU Clinical Deterioration & Early Intervention Monitor</p>
-</div>
 
-<div class="container">
+<!-- =========================================================
+     HEADER
+========================================================= -->
 
-    <div class="patient-card">
-        <h2>Patient Vital Signs</h2>
+<header class="topbar">
 
-        <div class="grid">
+    <div class="brand">
 
-            <div class="input-box">
-                <label>Heart Rate (bpm)</label>
-                <input type="number" id="heart_rate" value="101">
-            </div>
-
-            <div class="input-box">
-                <label>Systolic Blood Pressure</label>
-                <input type="number" id="systolic_bp" value="110">
-            </div>
-
-            <div class="input-box">
-                <label>SpO₂ (%)</label>
-                <input type="number" id="spo2" value="92">
-            </div>
-
-            <div class="input-box">
-                <label>Lactate (mmol/L)</label>
-                <input type="number" step="0.1" id="lactate" value="2.1">
-            </div>
-
+        <div class="brand-logo">
+            P
         </div>
 
-        <button type="button" onclick="predict()">Analyze Patient Risk</button>
-    </div>
+        <div class="brand-text">
 
+            <h1>PulseTech</h1>
 
-    <div class="info">
+            <p>
+                ICU Clinical Deterioration & Early Intervention Monitor
+            </p>
 
-        <div class="card">
-            <h3>❤️ Heart Rate</h3>
-            <div class="value" id="heartDisplay">101 bpm</div>
-        </div>
-
-        <div class="card">
-            <h3>🩸 Blood Pressure</h3>
-            <div class="value" id="bpDisplay">110 mmHg</div>
-        </div>
-
-        <div class="card">
-            <h3>💧 SpO₂</h3>
-            <div class="value" id="spo2Display">92 %</div>
-        </div>
-
-        <div class="card">
-            <h3>🧪 Lactate</h3>
-            <div class="value" id="lactateDisplay">2.1</div>
         </div>
 
     </div>
 
 
-    <div class="risk">
-        <h2>Sepsis Risk Assessment</h2>
+    <div class="status-area">
 
-        <div class="risk-value" id="riskResult">
-            Awaiting Analysis
+        <div class="status">
+
+            <span class="status-dot"></span>
+
+            TELEMETRY SYNC: LIVE
+
         </div>
 
-        <p id="probability">
-            Enter patient vitals and analyze the risk.
-        </p>
+        <div class="status">
+            ML PREDICTION ENGINE
+        </div>
+
     </div>
 
-</div>
+</header>
 
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="main">
+    <section class="beds-section">
+
+    <div class="section-heading">
+        <div>
+            <h2>ICU UNIT A // ACTIVE BEDS</h2>
+            <p>Select a patient bed to view vitals and clinical details.</p>
+        </div>
+
+        <span class="bed-count">3 ACTIVE</span>
+    </div>
+
+    <div class="beds-grid">
+
+        <a href="/patient-details/04" class="bed-card high">
+            <div class="bed-card-top">
+                <div>
+                    <div class="bed-number">BED 04</div>
+                    <div class="patient-name">Arthur Dent</div>
+                </div>
+
+                <span class="risk-badge high-badge">88% RISK</span>
+            </div>
+
+            <div class="patient-info">
+                68M • Post-Op Peritonitis
+            </div>
+
+            <div class="status high-status">
+                ⚠ Crash Horizon: ~4.2 Hours
+            </div>
+
+            <div class="view-patient">
+                VIEW PATIENT →
+            </div>
+        </a>
+
+
+        <a href="/patient-details/07" class="bed-card medium">
+            <div class="bed-card-top">
+                <div>
+                    <div class="bed-number">BED 07</div>
+                    <div class="patient-name">Elena Rostova</div>
+                </div>
+
+                <span class="risk-badge medium-badge">54% RISK</span>
+            </div>
+
+            <div class="patient-info">
+                54F • Acute Pyelonephritis
+            </div>
+
+            <div class="status medium-status">
+                ◷ Trend: SpO₂ Gradual Drop
+            </div>
+
+            <div class="view-patient">
+                VIEW PATIENT →
+            </div>
+        </a>
+
+
+        <a href="/patient-details/12" class="bed-card low">
+            <div class="bed-card-top">
+                <div>
+                    <div class="bed-number">BED 12</div>
+                    <div class="patient-name">Marcus Vance</div>
+                </div>
+
+                <span class="risk-badge low-badge">12% RISK</span>
+            </div>
+
+            <div class="patient-info">
+                42M • Observation
+            </div>
+
+            <div class="status low-status">
+                ✓ Hemodynamics Stable
+            </div>
+
+            <div class="view-patient">
+                VIEW PATIENT →
+            </div>
+        </a>
+
+    </div>
+
+</section>
+
+
+
+
+
+    <!-- =====================================================
+         PATIENT DASHBOARD
+    ====================================================== -->
+
+    <section id="patientDashboard">
+
+
+        <div class="dashboard-grid">
+
+
+            <!-- =================================================
+                 LEFT PATIENT PANEL
+            ================================================== -->
+
+            <aside class="patient-panel">
+
+                <div class="panel-heading">
+
+                    <h3>
+                        ICU UNIT A // PATIENT
+                    </h3>
+
+                    <div class="critical-count">
+                        ACTIVE
+                    </div>
+
+                </div>
+
+
+               <div class="patient-card" onclick="openPatientDetails()">
+
+                    <div class="patient-top">
+
+                        <div>
+
+                            <div
+                                class="bed-number"
+                                id="sideBed"
+                            >
+                                Bed --
+                            </div>
+
+                            <div
+                                class="patient-name"
+                                id="sideName"
+                            >
+                                --
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="risk-badge"
+                            id="sideRisk"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="condition"
+                        id="sideCondition"
+                    >
+                        --
+                    </div>
+
+
+                    <div
+                        class="trend"
+                        id="sideTrend"
+                    >
+                        ● Monitoring active
+                    </div>
+
+                </div>
+
+
+                <div class="patient-card">
+
+                    <div class="patient-top">
+
+                        <div>
+
+                            <div class="bed-number">
+                                ML STATUS
+                            </div>
+
+                            <div class="patient-name">
+                                Prediction engine
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="trend">
+                        ● Model connected
+                    </div>
+
+                </div>
+
+
+                <div class="patient-card">
+
+                    <div class="patient-top">
+
+                        <div>
+
+                            <div class="bed-number">
+                                TELEMETRY
+                            </div>
+
+                            <div class="patient-name">
+                                Real-time monitoring
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="trend">
+                        ● Data synchronized
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+
+            <!-- =================================================
+                 RIGHT PANEL
+            ================================================== -->
+
+            <div class="right-panel">
+
+
+                <!-- ================= PATIENT HEADER ================= -->
+
+                <div class="patient-header">
+
+                    <div>
+
+                        <h2 id="patientTitle">
+                            Patient
+                        </h2>
+
+                        <p id="patientInfo">
+                            Select a bed to begin monitoring
+                        </p>
+
+                    </div>
+
+
+                    <div class="large-risk">
+
+                        <div class="large-risk-label">
+                            Predicted Deterioration Risk
+                        </div>
+
+                        <div
+                            class="large-risk-value"
+                            id="largeRisk"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================= VITAL CARDS ================= -->
+
+                <div class="vitals-grid">
+
+
+                    <div class="vital-card">
+
+                        <div class="vital-label">
+                            Heart Rate
+                        </div>
+
+                        <div>
+
+                            <span
+                                class="vital-value"
+                                id="heartValue"
+                            >
+                                --
+                            </span>
+
+                            <span class="vital-unit">
+                                bpm
+                            </span>
+
+                        </div>
+
+                        <div class="vital-line heart-line"></div>
+
+                    </div>
+
+
+
+                    <div class="vital-card">
+
+                        <div class="vital-label">
+                            Blood Pressure
+                        </div>
+
+                        <div>
+
+                            <span
+                                class="vital-value"
+                                id="bpValue"
+                            >
+                                --
+                            </span>
+
+                            <span class="vital-unit">
+                                mmHg
+                            </span>
+
+                        </div>
+
+                        <div class="vital-line bp-line"></div>
+
+                    </div>
+
+
+
+                    <div class="vital-card">
+
+                        <div class="vital-label">
+                            Oxygen Saturation
+                        </div>
+
+                        <div>
+
+                            <span
+                                class="vital-value"
+                                id="spoValue"
+                            >
+                                --
+                            </span>
+
+                            <span class="vital-unit">
+                                %
+                            </span>
+
+                        </div>
+
+                        <div class="vital-line spo-line"></div>
+
+                    </div>
+
+
+
+                    <div class="vital-card">
+
+                        <div class="vital-label">
+                            Serum Lactate
+                        </div>
+
+                        <div>
+
+                            <span
+                                class="vital-value"
+                                id="lactateValue"
+                            >
+                                --
+                            </span>
+
+                            <span class="vital-unit">
+                                mmol/L
+                            </span>
+
+                        </div>
+
+                        <div class="vital-line lactate-line"></div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ================= GRAPHS ================= -->
+
+                <div class="graph-grid">
+
+
+                    <div class="graph-card">
+
+                        <h3>
+                            ❤️ Heart Rate Trend
+                        </h3>
+
+                        <div class="chart-container">
+
+                            <canvas id="heartChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="graph-card">
+
+                        <h3>
+                            🩸 Blood Pressure Trend
+                        </h3>
+
+                        <div class="chart-container">
+
+                            <canvas id="bpChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="graph-card">
+
+                        <h3>
+                            🫁 Oxygen Saturation Trend
+                        </h3>
+
+                        <div class="chart-container">
+
+                            <canvas id="spoChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="graph-card">
+
+                        <h3>
+                            🧪 Serum Lactate Trend
+                        </h3>
+
+                        <div class="chart-container">
+
+                            <canvas id="lactateChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ================= INTERVENTION ================= -->
+
+                <div class="intervention">
+
+                    <h3>
+                        RECOMMENDED INTERVENTION
+                    </h3>
+
+                    <p id="interventionText">
+                        Select a patient to generate intervention guidance.
+                    </p>
+
+                    <button
+    type="button"
+    class="intervention-button"
+    onclick="showRecommendation()">
+    ⚡ VIEW CLINICAL RECOMMENDATION
+</button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
 
 <script>
 
-async function predict() {
 
-    const heart_rate = document.getElementById("heart_rate").value;
-    const systolic_bp = document.getElementById("systolic_bp").value;
-    const spo2 = document.getElementById("spo2").value;
-    const lactate = document.getElementById("lactate").value;
+let heartChart = null;
+let bpChart = null;
+let spoChart = null;
+let lactateChart = null;
 
-    document.getElementById("heartDisplay").innerText =
-        heart_rate + " bpm";
 
-    document.getElementById("bpDisplay").innerText =
-        systolic_bp + " mmHg";
 
-    document.getElementById("spo2Display").innerText =
-        spo2 + " %";
+/* =========================================================
+   LOAD PATIENT FROM FLASK
+========================================================= */
 
-    document.getElementById("lactateDisplay").innerText =
-        lactate;
+async function loadPatient() {
 
-    const response = await fetch("/predict", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            heart_rate: Number(heart_rate),
-            systolic_bp: Number(systolic_bp),
-            spo2: Number(spo2),
-            lactate: Number(lactate)
-        })
-    });
+    const input =
+        document.getElementById("bedNumber");
 
-    const data = await response.json();
+    const bed =
+        input.value.trim();
 
-    document.getElementById("riskResult").innerText =
-        data.prediction === 1 ? "⚠️ HIGH RISK" : "✅ LOW RISK";
+    const error =
+        document.getElementById("errorMessage");
 
-    document.getElementById("probability").innerText =
-        "Risk Probability: " + data.probability + "%";
+
+    error.style.display = "none";
+
+
+
+    if (!bed) {
+
+        showError(
+            "Please enter a Bed Number."
+        );
+
+        return;
+    }
+
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/patient/${encodeURIComponent(bed)}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+
+        if (!response.ok) {
+
+            showError(
+                data.error ||
+                "Patient not found."
+            );
+
+            document
+                .getElementById(
+                    "patientDashboard"
+                )
+                .style.display = "none";
+
+            return;
+        }
+
+
+
+        displayPatient(data);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(
+            "Unable to connect to the PulseTech server."
+        );
+
+    }
+
 }
+
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function showError(message) {
+
+    const error =
+        document.getElementById(
+            "errorMessage"
+        );
+
+    error.innerText =
+        "⚠ " + message;
+
+    error.style.display =
+        "block";
+
+}
+
+
+
+/* =========================================================
+   DISPLAY PATIENT
+========================================================= */
+
+function displayPatient(data) {
+
+
+    document
+        .getElementById(
+            "patientDashboard"
+        )
+        .style.display = "block";
+
+
+
+    /* Patient header */
+
+    document
+        .getElementById(
+            "patientTitle"
+        )
+        .innerText =
+        `Bed ${data.bed} • ${data.name}`;
+
+
+
+    document
+        .getElementById(
+            "patientInfo"
+        )
+        .innerText =
+        `${data.age} • ${data.condition}`;
+
+
+
+    /* Side panel */
+
+    document
+        .getElementById(
+            "sideBed"
+        )
+        .innerText =
+        `Bed ${data.bed}`;
+
+
+
+    document
+        .getElementById(
+            "sideName"
+        )
+        .innerText =
+        data.name;
+
+
+
+    document
+        .getElementById(
+            "sideCondition"
+        )
+        .innerText =
+        data.condition;
+
+
+
+    /* Risk */
+
+    const risk =
+        document.getElementById(
+            "sideRisk"
+        );
+
+
+    risk.innerText =
+        `${data.risk}% ${data.risk_level}`;
+
+
+    risk.className =
+        "risk-badge " +
+        getRiskClass(
+            data.risk_level
+        );
+
+
+
+    const largeRisk =
+        document.getElementById(
+            "largeRisk"
+        );
+
+
+    largeRisk.innerText =
+        `${data.risk}%`;
+
+
+    largeRisk.style.color =
+        getRiskColor(
+            data.risk_level
+        );
+
+
+
+    /* Latest vitals */
+
+    document
+        .getElementById(
+            "heartValue"
+        )
+        .innerText =
+        getLast(
+            data.heart_rate
+        );
+
+
+
+    document
+        .getElementById(
+            "bpValue"
+        )
+        .innerText =
+        `${getLast(data.bp_systolic)}/${getLast(data.bp_diastolic)}`;
+
+
+
+    document
+        .getElementById(
+            "spoValue"
+        )
+        .innerText =
+        getLast(
+            data.spo2
+        );
+
+
+
+    document
+        .getElementById(
+            "lactateValue"
+        )
+        .innerText =
+        getLast(
+            data.lactate
+        );
+
+
+
+    /* Trend */
+
+    const trend =
+        document.getElementById(
+            "sideTrend"
+        );
+
+
+    if (
+        data.risk_level === "HIGH"
+    ) {
+
+        trend.innerText =
+            "⚠ Critical deterioration risk";
+
+        trend.className =
+            "trend critical";
+
+    }
+
+    else if (
+        data.risk_level === "MEDIUM"
+    ) {
+
+        trend.innerText =
+            "● Patient requires monitoring";
+
+        trend.className =
+            "trend warning";
+
+    }
+
+    else {
+
+        trend.innerText =
+            "✓ Hemodynamics stable";
+
+        trend.className =
+            "trend";
+
+    }
+
+
+
+    /* Recommendation */
+
+    document
+        .getElementById(
+            "interventionText"
+        )
+        .innerText =
+        getRecommendation(
+            data.risk_level
+        );
+
+
+
+    /* Draw graphs */
+
+    drawCharts(data);
+
+}
+
+
+
+/* =========================================================
+   LAST VALUE
+========================================================= */
+
+function getLast(array) {
+
+    if (
+        !array ||
+        array.length === 0
+    ) {
+
+        return "--";
+
+    }
+
+    return array[array.length - 1];
+
+}
+
+
+
+/* =========================================================
+   RISK CLASS
+========================================================= */
+
+function getRiskClass(level) {
+
+    if (level === "HIGH") {
+
+        return "risk-high";
+
+    }
+
+    if (level === "MEDIUM") {
+
+        return "risk-medium";
+
+    }
+
+    return "risk-low";
+
+}
+
+
+
+/* =========================================================
+   RISK COLOR
+========================================================= */
+
+function getRiskColor(level) {
+
+    if (level === "HIGH") {
+
+        return "#ff5477";
+
+    }
+
+    if (level === "MEDIUM") {
+
+        return "#f6b93b";
+
+    }
+
+    return "#20d9a0";
+
+}
+
+
+
+/* =========================================================
+   RECOMMENDATION
+========================================================= */
+
+function getRecommendation(level) {
+
+    if (level === "HIGH") {
+
+        return "High deterioration risk detected. Immediate clinical assessment and close monitoring recommended.";
+
+    }
+
+    if (level === "MEDIUM") {
+
+        return "Moderate deterioration risk detected. Continue close monitoring and reassess patient vitals.";
+
+    }
+
+    return "Low deterioration risk. Continue routine monitoring.";
+
+}
+
+
+
+/* =========================================================
+   CHART OPTIONS
+========================================================= */
+
+function chartOptions() {
+
+    return {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        interaction: {
+            mode: "index",
+            intersect: false
+        },
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+                    color: "#8794af"
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                ticks: {
+                    color: "#687690"
+                },
+
+                grid: {
+                    color:
+                        "rgba(255,255,255,0.04)"
+                }
+
+            },
+
+            y: {
+
+                ticks: {
+                    color: "#687690"
+                },
+
+                grid: {
+                    color:
+                        "rgba(255,255,255,0.04)"
+                }
+
+            }
+
+        }
+
+    };
+
+}
+
+
+
+/* =========================================================
+   DRAW CHARTS
+========================================================= */
+
+function drawCharts(data) {
+
+
+    /* Destroy previous charts */
+
+    if (heartChart)
+        heartChart.destroy();
+
+    if (bpChart)
+        bpChart.destroy();
+
+    if (spoChart)
+        spoChart.destroy();
+
+    if (lactateChart)
+        lactateChart.destroy();
+
+
+
+    const labels = [
+        "T-60",
+        "T-50",
+        "T-40",
+        "T-30",
+        "T-20",
+        "T-10",
+        "NOW"
+    ];
+
+
+
+    /* ================= HEART ================= */
+
+    heartChart =
+        new Chart(
+            document.getElementById(
+                "heartChart"
+            ),
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Heart Rate",
+
+                            data:
+                                data.heart_rate,
+
+                            borderColor:
+                                "#ff315d",
+
+                            backgroundColor:
+                                "rgba(255,49,93,0.10)",
+
+                            fill: true,
+
+                            tension: 0.4,
+
+                            pointRadius: 3
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions()
+
+            }
+        );
+
+
+
+    /* ================= BP ================= */
+
+    bpChart =
+        new Chart(
+            document.getElementById(
+                "bpChart"
+            ),
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Systolic",
+
+                            data:
+                                data.bp_systolic,
+
+                            borderColor:
+                                "#22d3ee",
+
+                            tension: 0.4,
+
+                            pointRadius: 3
+
+                        },
+
+                        {
+
+                            label:
+                                "Diastolic",
+
+                            data:
+                                data.bp_diastolic,
+
+                            borderColor:
+                                "#8b5cf6",
+
+                            tension: 0.4,
+
+                            pointRadius: 3
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions()
+
+            }
+        );
+
+
+
+    /* ================= SPO2 ================= */
+
+    spoChart =
+        new Chart(
+            document.getElementById(
+                "spoChart"
+            ),
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "SpO₂",
+
+                            data:
+                                data.spo2,
+
+                            borderColor:
+                                "#20d9a0",
+
+                            backgroundColor:
+                                "rgba(32,217,160,0.10)",
+
+                            fill: true,
+
+                            tension: 0.4,
+
+                            pointRadius: 3
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions()
+
+            }
+        );
+
+
+
+    /* ================= LACTATE ================= */
+
+    lactateChart =
+        new Chart(
+            document.getElementById(
+                "lactateChart"
+            ),
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Lactate",
+
+                            data:
+                                data.lactate,
+
+                            borderColor:
+                                "#f59e0b",
+
+                            backgroundColor:
+                                "rgba(245,158,11,0.10)",
+
+                            fill: true,
+
+                            tension: 0.4,
+
+                            pointRadius: 3
+
+                        }
+
+                    ]
+
+                },
+
+                options:
+                    chartOptions()
+
+            }
+        );
+
+}
+
+
+
+/* =========================================================
+   ENTER KEY
+========================================================= */
+
+document
+    .getElementById(
+        "bedNumber"
+    )
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                loadPatient();
+
+            }
+
+        }
+    );
+
 
 </script>
 
+<div id="recommendationModal" class="recommendation-modal">
+    <div class="recommendation-box">
+
+        <button class="close-btn" onclick="closeRecommendation()">×</button>
+
+        <h2>⚡ Clinical Recommendation</h2>
+
+        <div id="recommendationContent">
+            <p>Analyzing patient vitals...</p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function showRecommendation() {
+
+    const modal = document.getElementById("recommendationModal");
+    const content = document.getElementById("recommendationContent");
+
+    modal.style.display = "flex";
+
+    const bed = window.selectedBed || "04";
+
+    fetch("/patient/" + bed)
+        .then(response => response.json())
+        .then(patient => {
+
+            if (patient.error) {
+                content.innerHTML = `
+                    <p style="color:#ff4d6d;">
+                        ${patient.error}
+                    </p>
+                `;
+                return;
+            }
+
+            let recommendation = "";
+
+            if (patient.risk >= 70) {
+
+                recommendation = `
+                    <div class="risk-high">
+                        <h3>HIGH RISK — Immediate Attention Required</h3>
+
+                        <p>
+                            Patient <b>${patient.name}</b>
+                            in Bed ${patient.bed}
+                            has a deterioration risk of
+                            <b>${patient.risk}%</b>.
+                        </p>
+
+                        <ul>
+                            <li>Immediate clinical assessment recommended.</li>
+                            <li>Closely monitor heart rate and blood pressure.</li>
+                            <li>Monitor SpO₂ continuously.</li>
+                            <li>Repeat lactate assessment as clinically appropriate.</li>
+                        </ul>
+                    </div>
+                `;
+
+            } else if (patient.risk >= 30) {
+
+                recommendation = `
+                    <div class="risk-medium">
+                        <h3>MEDIUM RISK — Close Monitoring</h3>
+
+                        <p>
+                            Patient <b>${patient.name}</b>
+                            in Bed ${patient.bed}
+                            has a deterioration risk of
+                            <b>${patient.risk}%</b>.
+                        </p>
+
+                        <ul>
+                            <li>Continue close vital-sign monitoring.</li>
+                            <li>Observe SpO₂ and blood-pressure trends.</li>
+                            <li>Reassess if the clinical condition changes.</li>
+                        </ul>
+                    </div>
+                `;
+
+            } else {
+
+                recommendation = `
+                    <div class="risk-low">
+                        <h3>LOW RISK — Continue Monitoring</h3>
+
+                        <p>
+                            Patient <b>${patient.name}</b>
+                            in Bed ${patient.bed}
+                            has a deterioration risk of
+                            <b>${patient.risk}%</b>.
+                        </p>
+
+                        <ul>
+                            <li>Continue routine monitoring.</li>
+                            <li>Maintain standard clinical observation.</li>
+                            <li>Reassess if new symptoms or abnormal vitals appear.</li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = recommendation;
+        })
+        .catch(error => {
+
+            content.innerHTML = `
+                <p style="color:#ff4d6d;">
+                    Unable to load clinical recommendation.
+                </p>
+            `;
+
+            console.error(error);
+        });
+}
+
+function closeRecommendation() {
+    document.getElementById("recommendationModal").style.display = "none";
+}
+function openPatientDetails() {
+
+    const bedElement = document.getElementById("sideBed");
+
+    if (!bedElement) {
+        alert("Bed information not found.");
+        return;
+    }
+
+    let bedText = bedElement.textContent.trim();
+
+    let bed = bedText.replace("Bed", "").trim();
+
+    if (!bed) {
+        alert("Please select a patient bed first.");
+        return;
+    }
+
+    window.location.href = "/patient-details/" + bed;
+}
+</script>
 </body>
+
 </html>

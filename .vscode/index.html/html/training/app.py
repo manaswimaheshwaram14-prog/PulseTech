@@ -107,7 +107,89 @@ def predict():
 def logout():
     return redirect("/")
 
+PATIENTS = {
+    "04": {
+        "bed": "04",
+        "name": "Arthur Dent",
+        "age": "68M",
+        "condition": "Post-Op Peritonitis",
+        "risk": 88,
+        "risk_level": "HIGH",
+        "heart_rate": [88, 92, 96, 101, 106, 109, 112],
+        "bp_systolic": [110, 106, 102, 98, 94, 91, 88],
+        "bp_diastolic": [70, 68, 66, 63, 60, 57, 54],
+        "spo2": [98, 97, 96, 95, 94, 92, 91],
+        "lactate": [1.8, 2.0, 2.2, 2.5, 2.8, 3.3, 3.8]
+    },
 
+    "07": {
+        "bed": "07",
+        "name": "Elena Rostova",
+        "age": "54F",
+        "condition": "Acute Pyelonephritis",
+        "risk": 54,
+        "risk_level": "MEDIUM",
+        "heart_rate": [82, 84, 86, 89, 91, 94, 96],
+        "bp_systolic": [118, 116, 114, 112, 110, 108, 106],
+        "bp_diastolic": [76, 75, 74, 72, 70, 69, 68],
+        "spo2": [98, 98, 97, 97, 96, 96, 95],
+        "lactate": [1.4, 1.5, 1.7, 1.8, 2.0, 2.1, 2.3]
+    },
+
+    "12": {
+        "bed": "12",
+        "name": "Marcus Vance",
+        "age": "42M",
+        "condition": "Observation",
+        "risk": 12,
+        "risk_level": "LOW",
+        "heart_rate": [72, 73, 72, 74, 73, 72, 71],
+        "bp_systolic": [122, 121, 123, 122, 124, 123, 122],
+        "bp_diastolic": [80, 79, 80, 81, 80, 79, 80],
+        "spo2": [99, 99, 98, 99, 99, 98, 99],
+        "lactate": [1.1, 1.0, 1.1, 1.0, 1.1, 1.0, 1.0]
+    }
+}
+
+
+@app.route("/patient-details/<bed>")
+def patient_details(bed):
+    bed = bed.strip()
+
+    if bed not in PATIENTS:
+        return "Patient not found", 404
+
+    patient = PATIENTS[bed]
+
+    return render_template(
+        "patient.html",
+        patient=patient
+    )
+
+
+@app.route("/recommendation/<bed>")
+def recommendation(bed):
+    bed = bed.strip()
+
+    if bed not in PATIENTS:
+        return "Patient not found", 404
+
+    patient = PATIENTS[bed]
+
+    return render_template(
+        "recommendation.html",
+        patient=patient
+    )
+@app.route("/patient/<bed>")
+def get_patient(bed):
+    bed = bed.strip()
+
+    if bed not in PATIENTS:
+        return jsonify({
+            "error": f"Bed {bed} not found."
+        }), 404
+
+    return jsonify(PATIENTS[bed])
 if __name__ == "__main__":
     app.run(debug=True)
 

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PulseTech - Patient Details</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #050a18;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .topbar {
+            padding: 22px 35px;
+            background: #0b1224;
+            border-bottom: 1px solid #202b45;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #ff3158;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 35px auto;
+            padding: 0 25px;
+        }
+
+        .back {
+            display: inline-block;
+            color: #8ea0c0;
+            text-decoration: none;
+            margin-bottom: 25px;
+        }
+
+        .back:hover {
+            color: white;
+        }
+
+        .patient-header {
+            background: #0b1224;
+            border: 1px solid #202b45;
+            border-radius: 18px;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bed {
+            color: #ff3158;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .patient-name {
+            font-size: 30px;
+            margin: 0;
+        }
+
+        .patient-info {
+            color: #8291ad;
+            margin-top: 10px;
+        }
+
+        .risk {
+            padding: 12px 18px;
+            border-radius: 10px;
+            background: rgba(255, 49, 88, 0.12);
+            border: 1px solid #ff3158;
+            color: #ff6682;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .risk-number {
+            font-size: 26px;
+        }
+
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .vital-card {
+            background: #0b1224;
+            border: 1px solid #202b45;
+            border-radius: 18px;
+            padding: 20px;
+        }
+
+        .vital-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .vital-subtitle {
+            color: #71809b;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .chart-box {
+            height: 240px;
+        }
+
+        .recommendation {
+            margin-top: 25px;
+            background: #0b1224;
+            border: 1px solid #202b45;
+            border-radius: 18px;
+            padding: 25px;
+        }
+
+        .recommendation h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .recommendation p {
+            color: #8291ad;
+        }
+
+        .recommendation-button {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            background: #ff174f;
+            color: white;
+            padding: 17px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .recommendation-button:hover {
+            background: #e91447;
+        }
+
+        @media (max-width: 800px) {
+            .vitals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        Pulse<span>Tech</span>
+    </div>
+</header>
+
+
+<div class="container">
+
+    <a href="/" class="back">
+        ← Back to ICU Dashboard
+    </a>
+
+
+    <!-- PATIENT HEADER -->
+
+    <div class="patient-header">
+
+        <div>
+            <div class="bed">
+                BED {{ patient.bed }}
+            </div>
+
+            <h1 class="patient-name">
+                {{ patient.name }}
+            </h1>
+
+            <div class="patient-info">
+                {{ patient.age }} • {{ patient.condition }}
+            </div>
+        </div>
+
+        <div class="risk">
+
+            <div>RISK LEVEL</div>
+
+            <div class="risk-number">
+                {{ patient.risk }}%
+            </div>
+
+            <div>
+                {{ patient.risk_level }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- VITAL GRAPHS -->
+
+    <div class="vitals-grid">
+
+        <!-- HEART RATE -->
+
+        <div class="vital-card">
+
+            <div class="vital-title">
+                Heart Rate
+            </div>
+
+            <div class="vital-subtitle">
+                bpm
+            </div>
+
+            <div class="chart-box">
+                <canvas id="heartChart"></canvas>
+            </div>
+
+        </div>
+
+
+        <!-- BLOOD PRESSURE -->
+
+        <div class="vital-card">
+
+            <div class="vital-title">
+                Blood Pressure
+            </div>
+
+            <div class="vital-subtitle">
+                Systolic / Diastolic mmHg
+            </div>
+
+            <div class="chart-box">
+                <canvas id="bpChart"></canvas>
+            </div>
+
+        </div>
+
+
+        <!-- SPO2 -->
+
+        <div class="vital-card">
+
+            <div class="vital-title">
+                Oxygen Saturation
+            </div>
+
+            <div class="vital-subtitle">
+                SpO₂ %
+            </div>
+
+            <div class="chart-box">
+                <canvas id="spo2Chart"></canvas>
+            </div>
+
+        </div>
+
+
+        <!-- LACTATE -->
+
+        <div class="vital-card">
+
+            <div class="vital-title">
+                Serum Lactate
+            </div>
+
+            <div class="vital-subtitle">
+                mmol/L
+            </div>
+
+            <div class="chart-box">
+                <canvas id="lactateChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RECOMMENDATION -->
+
+    <div class="recommendation">
+
+        <h2>
+            RECOMMENDED INTERVENTION
+        </h2>
+
+        <p>
+            High deterioration risk detected.
+            Review the patient's clinical risk probability
+            and recommended intervention.
+        </p>
+
+        <a
+            href="/recommendation/{{ patient.bed }}"
+            class="recommendation-button"
+        >
+            ⚡ VIEW CLINICAL RECOMMENDATION
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const heartRate = {{ patient.heart_rate | tojson }};
+    const systolic = {{ patient.bp_systolic | tojson }};
+    const diastolic = {{ patient.bp_diastolic | tojson }};
+    const spo2 = {{ patient.spo2 | tojson }};
+    const lactate = {{ patient.lactate | tojson }};
+
+
+    const labels = [
+        "T-6",
+        "T-5",
+        "T-4",
+        "T-3",
+        "T-2",
+        "T-1",
+        "NOW"
+    ];
+
+
+    new Chart(
+        document.getElementById("heartChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: "Heart Rate",
+                    data: heartRate,
+                    borderColor: "#ff3158",
+                    backgroundColor: "rgba(255,49,88,0.12)",
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        grid: {
+                            color: "rgba(255,255,255,0.06)"
+                        }
+                    },
+
+                    x: {
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    new Chart(
+        document.getElementById("bpChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: labels,
+
+                datasets: [
+
+                    {
+                        label: "Systolic",
+                        data: systolic,
+                        borderColor: "#06b6d4",
+                        tension: 0.35,
+                        borderWidth: 3
+                    },
+
+                    {
+                        label: "Diastolic",
+                        data: diastolic,
+                        borderColor: "#6366f1",
+                        tension: 0.35,
+                        borderWidth: 3
+                    }
+
+                ]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    y: {
+                        grid: {
+                            color: "rgba(255,255,255,0.06)"
+                        }
+                    },
+
+                    x: {
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    new Chart(
+        document.getElementById("spo2Chart"),
+        {
+            type: "line",
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: "SpO₂",
+                    data: spo2,
+                    borderColor: "#18c98b",
+                    backgroundColor: "rgba(24,201,139,0.10)",
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        grid: {
+                            color: "rgba(255,255,255,0.06)"
+                        }
+                    },
+
+                    x: {
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    new Chart(
+        document.getElementById("lactateChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: "Lactate",
+                    data: lactate,
+                    borderColor: "#f5a623",
+                    backgroundColor: "rgba(245,166,35,0.10)",
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        grid: {
+                            color: "rgba(255,255,255,0.06)"
+                        }
+                    },
+
+                    x: {
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+</script>
+
+</body>
+</html>

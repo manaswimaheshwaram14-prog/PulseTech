@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PulseTech - Clinical Recommendation</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #050a18;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .topbar {
+            padding: 22px 35px;
+            background: #0b1224;
+            border-bottom: 1px solid #202b45;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #ff3158;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 25px;
+        }
+
+        .back {
+            color: #8291ad;
+            text-decoration: none;
+        }
+
+        .back:hover {
+            color: white;
+        }
+
+        .header {
+            margin-top: 25px;
+            background: #0b1224;
+            border: 1px solid #202b45;
+            border-radius: 18px;
+            padding: 30px;
+        }
+
+        .bed {
+            color: #ff3158;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        h1 {
+            margin: 8px 0;
+            font-size: 32px;
+        }
+
+        .condition {
+            color: #8291ad;
+        }
+
+        .risk-panel {
+            margin-top: 25px;
+            background: #0b1224;
+            border: 1px solid #202b45;
+            border-radius: 18px;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .risk-title {
+            color: #8291ad;
+            font-size: 15px;
+        }
+
+        .risk-number {
+            font-size: 72px;
+            font-weight: bold;
+            color: #ff3158;
+            margin: 15px 0;
+        }
+
+        .risk-level {
+            display: inline-block;
+            padding: 10px 22px;
+            border-radius: 10px;
+            background: rgba(255, 49, 88, 0.12);
+            border: 1px solid #ff3158;
+            color: #ff6682;
+            font-weight: bold;
+        }
+
+        .analysis {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #0b1224;
+            border: 1px solid #202b45;
+            border-radius: 18px;
+            padding: 25px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        .card p {
+            color: #8291ad;
+            line-height: 1.7;
+        }
+
+        .recommendation {
+            margin-top: 25px;
+            background: #0b1224;
+            border: 1px solid #202b45;
+            border-radius: 18px;
+            padding: 28px;
+        }
+
+        .recommendation h2 {
+            margin-top: 0;
+        }
+
+        .recommendation-text {
+            color: #dce4f5;
+            line-height: 1.7;
+        }
+
+        .warning {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            background: rgba(255, 49, 88, 0.10);
+            border: 1px solid rgba(255, 49, 88, 0.35);
+            color: #ff9aae;
+        }
+
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            padding: 16px;
+            border-radius: 12px;
+            background: #ff174f;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background: #e91447;
+        }
+
+        @media (max-width: 750px) {
+            .analysis {
+                grid-template-columns: 1fr;
+            }
+
+            .risk-number {
+                font-size: 55px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        Pulse<span>Tech</span>
+    </div>
+</header>
+
+
+<div class="container">
+
+    <a
+        href="/patient-details/{{ patient.bed }}"
+        class="back"
+    >
+        ← Back to Patient Details
+    </a>
+
+
+    <!-- PATIENT -->
+
+    <div class="header">
+
+        <div class="bed">
+            BED {{ patient.bed }}
+        </div>
+
+        <h1>
+            {{ patient.name }}
+        </h1>
+
+        <div class="condition">
+            {{ patient.age }} • {{ patient.condition }}
+        </div>
+
+    </div>
+
+
+    <!-- RISK -->
+
+    <div class="risk-panel">
+
+        <div class="risk-title">
+            CLINICAL DETERIORATION RISK PROBABILITY
+        </div>
+
+        <div class="risk-number">
+            {{ patient.risk }}%
+        </div>
+
+        <div class="risk-level">
+            {{ patient.risk_level }} RISK
+        </div>
+
+    </div>
+
+
+    <!-- ANALYSIS -->
+
+    <div class="analysis">
+
+        <div class="card">
+
+            <h2>
+                Patient Risk Assessment
+            </h2>
+
+            <p>
+                The current clinical data indicates a
+                <strong>{{ patient.risk_level }}</strong>
+                probability of deterioration.
+            </p>
+
+            <p>
+                Continuous monitoring of the patient's
+                vital parameters is recommended.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>
+                Current Condition
+            </h2>
+
+            <p>
+                Patient is currently assigned to
+                <strong>Bed {{ patient.bed }}</strong>.
+            </p>
+
+            <p>
+                Condition:
+                <strong>{{ patient.condition }}</strong>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- RECOMMENDATION -->
+
+    <div class="recommendation">
+
+        <h2>
+            RECOMMENDED CLINICAL ACTION
+        </h2>
+
+        <div class="recommendation-text">
+
+            {% if patient.risk >= 70 %}
+
+                <p>
+                    High deterioration risk detected.
+                    Immediate clinical assessment and
+                    close monitoring are recommended.
+                </p>
+
+                <div class="warning">
+                    ⚠ HIGH RISK — Prioritize this patient
+                    for immediate clinical review.
+                </div>
+
+            {% elif patient.risk >= 40 %}
+
+                <p>
+                    Moderate deterioration risk detected.
+                    Increase monitoring frequency and
+                    reassess the patient's vital trends.
+                </p>
+
+            {% else %}
+
+                <p>
+                    Current deterioration risk is relatively low.
+                    Continue routine monitoring and observe
+                    for significant changes.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <a
+        href="/patient-details/{{ patient.bed }}"
+        class="back-button"
+    >
+        ← RETURN TO PATIENT VITALS
+    </a>
+
+</div>
+
+</body>
+</html>
