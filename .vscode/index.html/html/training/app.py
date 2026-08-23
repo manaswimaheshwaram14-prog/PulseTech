@@ -34,11 +34,19 @@ def login_user():
     username = request.form.get("username")
     password = request.form.get("password")
 
-    if username in USERS and USERS[username] == password:
-        return render_template("dashboard.html")
-    else:
-        return render_template("login.html", error="Invalid username or password")
-@app.route("/signup", methods=["GET", "POST"])
+    if username not in USERS:
+        return render_template(
+            "login.html",
+            error="Account not found. Please Sign Up first."
+        )
+
+    if USERS[username] != password:
+        return render_template(
+            "login.html",
+            error="Incorrect password."
+        )
+
+    return render_template("dashboard.html")
 def signup():
     if request.method == "GET":
         return render_template("signup.html")
