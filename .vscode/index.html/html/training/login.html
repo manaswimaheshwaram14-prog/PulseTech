@@ -151,7 +151,9 @@
             placeholder="Enter password"
             required
         >
-
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
         <button type="submit">
             Sign In
         </button>
